@@ -94,6 +94,7 @@ h1 {
   color: #999;
 }
 
+
 /* =========================
    追加モーダル
 ========================= */
@@ -197,6 +198,7 @@ h1 {
   line-height: 1.6;
 }
 
+
 /* =========================
    Gift一覧
 ========================= */
@@ -237,6 +239,7 @@ h1 {
   padding: 15px;
   border-radius: 10px;
 }
+
 
 /* =========================
    ページ番号
@@ -324,8 +327,8 @@ h1 {
 <h1>レコチョク</h1>
 
 <img
+  id="header-image"
   class="header-image"
-  src="24BAC62E-3563-42A4-9EE5-F72598664198.jpeg"
   alt=""
 >
 
@@ -334,13 +337,16 @@ h1 {
 <div class="control-area">
 
   <div class="add-side">
+
     <button
       id="open-add-button"
       class="open-add-button"
     >
       🎁を追加
     </button>
+
   </div>
+
 
   <div class="stats-side">
 
@@ -364,21 +370,31 @@ h1 {
 
 </header>
 
+
 <div id="gift-list"></div>
+
 
 <div
   id="pagination"
   class="pagination"
 ></div>
 
-<a href="index.html" class="back">
+
+<a
+  href="index.html"
+  class="back"
+>
 ← サービス選択に戻る
 </a>
+
 
 </div>
 
 
-<!-- Gift追加モーダル -->
+
+<!-- =========================
+     Gift追加モーダル
+========================= -->
 
 <div
   id="add-modal"
@@ -400,6 +416,7 @@ h1 {
       ×
     </button>
 
+
     <div
       id="modal-title"
       class="modal-title"
@@ -407,9 +424,11 @@ h1 {
       🎁 Giftを追加
     </div>
 
+
     <div class="add-label">
       レコチョク Gift
     </div>
+
 
     <textarea
       id="gift-input"
@@ -418,12 +437,14 @@ h1 {
       autocomplete="off"
     ></textarea>
 
+
     <button
       id="submit-add-button"
       class="submit-add-button"
     >
       🎁を追加
     </button>
+
 
     <div class="modal-note">
       ギフト文章をそのまま貼り付けてOKです。<br>
@@ -436,7 +457,9 @@ h1 {
 </div>
 
 
+
 <script>
+
 
 /* =========================
    曲設定
@@ -447,53 +470,113 @@ const SONG_ID =
 
 
 /* =========================
+   サービス画像
+========================= */
+
+const headerImage =
+  document.getElementById(
+    "header-image"
+  );
+
+
+headerImage.src =
+  GIFTBOX_CONFIG.images.service;
+
+
+
+/* =========================
    Supabase
 ========================= */
 
 const SUPABASE_URL =
-"https://cgnluuynrurbsipwwluo.supabase.co";
+  "https://cgnluuynrurbsipwwluo.supabase.co";
+
 
 const SUPABASE_KEY =
-"sb_publishable_pZbtlCfKh1BVOxHaeXBIAA_CvfP0o0q";
+  "sb_publishable_pZbtlCfKh1BVOxHaeXBIAA_CvfP0o0q";
+
 
 const client =
-window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+
+/* =========================
+   パーツ
+========================= */
 
 const giftList =
-document.getElementById("gift-list");
+  document.getElementById(
+    "gift-list"
+  );
+
 
 const pagination =
-document.getElementById("pagination");
+  document.getElementById(
+    "pagination"
+  );
+
 
 const counter =
-document.getElementById("counter");
+  document.getElementById(
+    "counter"
+  );
+
 
 const updateTime =
-document.getElementById("update-time");
+  document.getElementById(
+    "update-time"
+  );
+
 
 const openAddButton =
-document.getElementById("open-add-button");
+  document.getElementById(
+    "open-add-button"
+  );
+
 
 const addModal =
-document.getElementById("add-modal");
+  document.getElementById(
+    "add-modal"
+  );
+
 
 const modalClose =
-document.getElementById("modal-close");
+  document.getElementById(
+    "modal-close"
+  );
+
 
 const giftInput =
-document.getElementById("gift-input");
+  document.getElementById(
+    "gift-input"
+  );
+
 
 const submitAddButton =
-document.getElementById("submit-add-button");
+  document.getElementById(
+    "submit-add-button"
+  );
 
-const RECEIVED_PER_PAGE = 20;
 
-let currentPage = 1;
-let allGifts = [];
-let receivedIds = new Set();
+const RECEIVED_PER_PAGE =
+  20;
+
+
+let currentPage =
+  1;
+
+
+let allGifts =
+  [];
+
+
+let receivedIds =
+  new Set();
+
 
 
 /* =========================
@@ -502,25 +585,43 @@ let receivedIds = new Set();
 
 function updateTimeDisplay() {
 
-  const now = new Date();
 
-  const month =
-    now.getMonth() + 1;
+  const now =
+    new Date();
 
-  const day =
-    now.getDate();
 
-  const hours =
-    String(now.getHours())
-      .padStart(2, "0");
+  const text =
+    new Intl.DateTimeFormat(
+      "ja-JP",
+      {
 
-  const minutes =
-    String(now.getMinutes())
-      .padStart(2, "0");
+        timeZone:
+          "Asia/Tokyo",
+
+        month:
+          "numeric",
+
+        day:
+          "numeric",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hour12:
+          false
+
+      }
+    ).format(now);
+
 
   updateTime.textContent =
-    `${month}月${day}日 ${hours}:${minutes}時点`;
+    text + "時点";
+
 }
+
 
 
 /* =========================
@@ -529,15 +630,23 @@ function updateTimeDisplay() {
 
 function extractUrl(text) {
 
+
   const match =
-    text.match(/https?:\/\/[^\s<>"']+/i);
+    text.match(
+      /https?:\/\/[^\s<>"']+/i
+    );
+
 
   if (!match) {
+
     return null;
+
   }
+
 
   let url =
     match[0].trim();
+
 
   url =
     url.replace(
@@ -545,25 +654,36 @@ function extractUrl(text) {
       ""
     );
 
+
   try {
+
 
     const checkedUrl =
       new URL(url);
+
 
     if (
       checkedUrl.protocol !== "https:" &&
       checkedUrl.protocol !== "http:"
     ) {
+
       return null;
+
     }
+
 
     return checkedUrl.href;
 
+
   } catch {
 
+
     return null;
+
   }
+
 }
+
 
 
 /* =========================
@@ -572,36 +692,56 @@ function extractUrl(text) {
 
 function openModal() {
 
-  addModal.classList.add("show");
+
+  addModal.classList.add(
+    "show"
+  );
+
 
   document.body.classList.add(
     "modal-open"
   );
 
+
   setTimeout(
     function () {
+
       giftInput.focus();
+
     },
     100
   );
+
 }
+
 
 
 function closeModal() {
 
-  addModal.classList.remove("show");
+
+  addModal.classList.remove(
+    "show"
+  );
+
 
   document.body.classList.remove(
     "modal-open"
   );
 
-  giftInput.value = "";
 
-  submitAddButton.disabled = false;
+  giftInput.value =
+    "";
+
+
+  submitAddButton.disabled =
+    false;
+
 
   submitAddButton.textContent =
     "🎁を追加";
+
 }
+
 
 
 openAddButton.addEventListener(
@@ -610,24 +750,30 @@ openAddButton.addEventListener(
 );
 
 
+
 modalClose.addEventListener(
   "click",
   closeModal
 );
 
 
+
 addModal.addEventListener(
   "click",
   function (event) {
+
 
     if (
       event.target === addModal
     ) {
 
       closeModal();
+
     }
+
   }
 );
+
 
 
 /* =========================
@@ -638,44 +784,61 @@ submitAddButton.addEventListener(
   "click",
   async function () {
 
+
     const giftText =
       giftInput.value.trim();
 
 
     if (!giftText) {
 
+
       alert(
         "ギフト文章を貼り付けてください。"
       );
 
+
       return;
+
     }
 
 
+
     const giftUrl =
-      extractUrl(giftText);
+      extractUrl(
+        giftText
+      );
 
 
     if (!giftUrl) {
+
 
       alert(
         "文章の中にGift URLが見つかりませんでした。"
       );
 
+
       return;
+
     }
+
 
 
     submitAddButton.disabled =
       true;
 
+
     submitAddButton.textContent =
       "追加中...";
 
 
-    const { error } =
+
+    const {
+      error
+    } =
       await client
-        .from("gifts")
+        .from(
+          "gifts"
+        )
         .insert({
 
           service:
@@ -690,60 +853,81 @@ submitAddButton.addEventListener(
         });
 
 
+
     if (error) {
 
-      console.error(error);
+
+      console.error(
+        error
+      );
+
 
       submitAddButton.disabled =
         false;
 
+
       submitAddButton.textContent =
         "🎁を追加";
+
 
       alert(
         "Giftの追加に失敗しました。"
       );
 
+
       return;
+
     }
+
 
 
     giftInput.value =
       "";
 
 
+
     submitAddButton.textContent =
       "☆ 𝑻𝒉𝒂𝒏𝒌 𝒚𝒐𝒖 ☆";
+
 
 
     await loadGifts();
 
 
+
     setTimeout(
       function () {
+
 
         if (
           !addModal.classList.contains(
             "show"
           )
         ) {
+
           return;
+
         }
 
 
         submitAddButton.disabled =
           false;
 
+
         submitAddButton.textContent =
           "🎁を追加";
 
+
         giftInput.focus();
+
 
       },
       1000
     );
+
   }
 );
+
 
 
 /* =========================
@@ -752,40 +936,58 @@ submitAddButton.addEventListener(
 
 async function loadGifts() {
 
+
   const {
     data: gifts,
     error
   } =
     await client
-      .from("gifts")
+
+      .from(
+        "gifts"
+      )
+
       .select(
         "id, gift_code, service, song_id"
       )
+
       .eq(
         "service",
         "recochoku"
       )
+
       .eq(
         "song_id",
         SONG_ID
       )
+
       .order(
         "id",
-        { ascending: true }
+        {
+          ascending: true
+        }
       );
+
 
 
   if (error) {
 
-    console.error(error);
+
+    console.error(
+      error
+    );
+
 
     giftList.innerHTML =
       `<div class="error">
         Giftを読み込めませんでした。
       </div>`;
 
+
     return;
+
   }
+
 
 
   const {
@@ -793,54 +995,81 @@ async function loadGifts() {
     error: receiptError
   } =
     await client
-      .from("gift_receipts")
-      .select("gift_id");
+
+      .from(
+        "gift_receipts"
+      )
+
+      .select(
+        "gift_id"
+      );
+
 
 
   if (receiptError) {
 
-    console.error(receiptError);
+
+    console.error(
+      receiptError
+    );
+
 
     giftList.innerHTML =
       `<div class="error">
         受け取り情報を読み込めませんでした。
       </div>`;
 
+
     return;
+
   }
+
 
 
   allGifts =
     gifts || [];
 
 
+
   receivedIds =
     new Set(
+
       (receipts || []).map(
-        item => item.gift_id
+        item =>
+          item.gift_id
       )
+
     );
+
 
 
   const unreceivedCount =
     allGifts.filter(
       gift =>
-        !receivedIds.has(gift.id)
+        !receivedIds.has(
+          gift.id
+        )
     ).length;
+
 
 
   counter.textContent =
     `未受け取り🎁${unreceivedCount}件`;
 
 
+
   updateTimeDisplay();
+
 
 
   const receivedCount =
     allGifts.filter(
       gift =>
-        receivedIds.has(gift.id)
+        receivedIds.has(
+          gift.id
+        )
     ).length;
+
 
 
   const totalPages =
@@ -853,19 +1082,26 @@ async function loadGifts() {
     );
 
 
+
   if (
     currentPage >
     totalPages
   ) {
 
+
     currentPage =
       totalPages;
+
   }
 
 
+
   renderGifts();
+
   renderPagination();
+
 }
+
 
 
 /* =========================
@@ -874,27 +1110,36 @@ async function loadGifts() {
 
 function renderGifts() {
 
+
   giftList.innerHTML =
     "";
+
 
 
   const unreceived =
     allGifts.filter(
       gift =>
-        !receivedIds.has(gift.id)
+        !receivedIds.has(
+          gift.id
+        )
     );
+
 
 
   const received =
     allGifts.filter(
       gift =>
-        receivedIds.has(gift.id)
+        receivedIds.has(
+          gift.id
+        )
     );
+
 
 
   const start =
     (currentPage - 1) *
     RECEIVED_PER_PAGE;
+
 
 
   const receivedPage =
@@ -905,6 +1150,7 @@ function renderGifts() {
     );
 
 
+
   const display =
     [
       ...unreceived,
@@ -912,25 +1158,34 @@ function renderGifts() {
     ];
 
 
+
   if (
     display.length === 0
   ) {
 
+
     giftList.innerHTML =
       `<div class="gift-card">
+
         <div style="text-align:center;">
           現在Giftはありません。
         </div>
+
       </div>`;
 
+
     return;
+
   }
+
 
 
   display.forEach(
     renderGift
   );
+
 }
+
 
 
 /* =========================
@@ -939,13 +1194,16 @@ function renderGifts() {
 
 function renderGift(gift) {
 
+
   const card =
     document.createElement(
       "div"
     );
 
+
   card.className =
     "gift-card";
+
 
 
   if (
@@ -954,17 +1212,22 @@ function renderGift(gift) {
     )
   ) {
 
+
     card.innerHTML =
       `<div class="received">
         受け取り済み
       </div>`;
 
+
     giftList.appendChild(
       card
     );
 
+
     return;
+
   }
+
 
 
   card.innerHTML =
@@ -973,15 +1236,18 @@ function renderGift(gift) {
     </button>`;
 
 
+
   const button =
     card.querySelector(
       ".receive-button"
     );
 
 
+
   button.addEventListener(
     "click",
     async function () {
+
 
       /*
         iPhone Safari対策
@@ -994,53 +1260,77 @@ function renderGift(gift) {
         );
 
 
+
       button.disabled =
         true;
+
 
       button.textContent =
         "確認中...";
 
 
+
       let giftUrl;
 
 
+
       try {
+
 
         giftUrl =
           new URL(
             gift.gift_code
           );
 
+
         if (
           giftUrl.protocol !== "https:" &&
           giftUrl.protocol !== "http:"
         ) {
+
           throw new Error();
+
         }
+
 
       } catch {
 
+
         if (newTab) {
+
           newTab.close();
+
         }
+
 
         button.disabled =
           false;
 
+
         button.textContent =
           "🎁 ギフトを受け取る";
+
 
         alert(
           "このGiftのURLが正しくありません。"
         );
 
+
         return;
+
       }
 
 
-      const { error } =
+
+      const {
+        error
+      } =
         await client
-          .from("gift_receipts")
+
+          .from(
+            "gift_receipts"
+          )
+
           .insert({
 
             gift_id:
@@ -1053,11 +1343,16 @@ function renderGift(gift) {
           });
 
 
+
       if (error) {
 
+
         if (newTab) {
+
           newTab.close();
+
         }
+
 
 
         if (
@@ -1065,51 +1360,70 @@ function renderGift(gift) {
           "23505"
         ) {
 
+
           alert(
             "このGiftは他の方が受け取り済みです。"
           );
 
+
           await loadGifts();
 
+
           return;
+
         }
+
 
 
         button.disabled =
           false;
 
+
         button.textContent =
           "🎁 ギフトを受け取る";
+
 
         alert(
           "受け取りに失敗しました。"
         );
 
+
         return;
+
       }
+
 
 
       if (newTab) {
 
+
         newTab.location.href =
           giftUrl.href;
 
+
       } else {
+
 
         window.location.href =
           giftUrl.href;
+
       }
 
 
+
       await loadGifts();
+
     }
   );
+
 
 
   giftList.appendChild(
     card
   );
+
 }
+
 
 
 /* =========================
@@ -1118,8 +1432,10 @@ function renderGift(gift) {
 
 function renderPagination() {
 
+
   pagination.innerHTML =
     "";
+
 
 
   const received =
@@ -1131,6 +1447,7 @@ function renderPagination() {
     );
 
 
+
   const totalPages =
     Math.ceil(
       received.length /
@@ -1138,11 +1455,15 @@ function renderPagination() {
     );
 
 
+
   if (
     totalPages <= 1
   ) {
+
     return;
+
   }
+
 
 
   const previous =
@@ -1150,39 +1471,52 @@ function renderPagination() {
       "button"
     );
 
+
   previous.className =
     "page-button";
 
+
   previous.textContent =
     "‹ 前へ";
+
 
   previous.disabled =
     currentPage === 1;
 
 
+
   previous.onclick =
     function () {
+
 
       if (
         currentPage > 1
       ) {
 
+
         currentPage--;
 
+
         renderGifts();
+
         renderPagination();
+
 
         window.scrollTo({
           top: 0,
           behavior: "smooth"
         });
+
       }
+
     };
+
 
 
   pagination.appendChild(
     previous
   );
+
 
 
   for (
@@ -1191,48 +1525,63 @@ function renderPagination() {
     page++
   ) {
 
+
     const button =
       document.createElement(
         "button"
       );
 
+
     button.className =
       "page-button";
 
+
     button.textContent =
       page;
+
 
 
     if (
       page === currentPage
     ) {
 
+
       button.classList.add(
         "active"
       );
+
     }
+
 
 
     button.onclick =
       function () {
 
+
         currentPage =
           page;
 
+
         renderGifts();
+
         renderPagination();
+
 
         window.scrollTo({
           top: 0,
           behavior: "smooth"
         });
+
       };
+
 
 
     pagination.appendChild(
       button
     );
+
   }
+
 
 
   const next =
@@ -1240,42 +1589,56 @@ function renderPagination() {
       "button"
     );
 
+
   next.className =
     "page-button";
 
+
   next.textContent =
     "次へ ›";
+
 
   next.disabled =
     currentPage ===
     totalPages;
 
 
+
   next.onclick =
     function () {
+
 
       if (
         currentPage <
         totalPages
       ) {
 
+
         currentPage++;
 
+
         renderGifts();
+
         renderPagination();
+
 
         window.scrollTo({
           top: 0,
           behavior: "smooth"
         });
+
       }
+
     };
+
 
 
   pagination.appendChild(
     next
   );
+
 }
+
 
 
 /* =========================
@@ -1284,7 +1647,9 @@ function renderPagination() {
 
 loadGifts();
 
+
 updateTimeDisplay();
+
 
 
 setInterval(
@@ -1293,10 +1658,12 @@ setInterval(
 );
 
 
+
 setInterval(
   loadGifts,
   30000
 );
+
 
 </script>
 
