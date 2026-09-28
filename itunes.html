@@ -6,6 +6,7 @@
 
 <title>iTunes</title>
 
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -469,6 +470,18 @@ h1 {
 
 <script>
 
+/* =========================
+   曲設定
+========================= */
+
+const SONG_ID =
+  GIFTBOX_CONFIG.songId;
+
+
+/* =========================
+   Supabase
+========================= */
+
 const SUPABASE_URL =
 "https://cgnluuynrurbsipwwluo.supabase.co";
 
@@ -596,11 +609,6 @@ modalClose.addEventListener(
 );
 
 
-/*
-  黒い背景部分をタップしても
-  閉じる
-*/
-
 addModal.addEventListener(
   "click",
   function (event) {
@@ -652,6 +660,9 @@ submitAddButton.addEventListener(
           service:
             "itunes",
 
+          song_id:
+            SONG_ID,
+
           gift_code:
             giftCode
 
@@ -676,11 +687,6 @@ submitAddButton.addEventListener(
     }
 
 
-    /*
-      入力欄だけ空にする。
-      モーダルは閉じない。
-    */
-
     giftInput.value =
       "";
 
@@ -689,27 +695,11 @@ submitAddButton.addEventListener(
       "☆ 𝑻𝒉𝒂𝒏𝒌 𝒚𝒐𝒖 ☆";
 
 
-    /*
-      モーダルの裏側の
-      Gift一覧を更新
-    */
-
     await loadGifts();
 
 
-    /*
-      1秒後に次のGiftを
-      そのまま入力可能
-    */
-
     setTimeout(
       function () {
-
-        /*
-          途中で×を押して
-          モーダルを閉じていた場合は
-          何もしない
-        */
 
         if (
           !addModal.classList.contains(
@@ -845,11 +835,15 @@ async function loadGifts() {
     await client
       .from("gifts")
       .select(
-        "id, gift_code, service"
+        "id, gift_code, service, song_id"
       )
       .eq(
         "service",
         "itunes"
+      )
+      .eq(
+        "song_id",
+        SONG_ID
       )
       .order(
         "id",
