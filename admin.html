@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GIFTBOX 管理</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
+
+  background: #f7f7f7;
+  margin: 0;
+  padding: 30px 15px;
+  color: #333;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  font-size: 27px;
+  margin: 10px 0 25px;
+}
+
+
+/* =========================
+   ログイン
+========================= */
+
+.login-box {
+  background: white;
+  padding: 24px 18px;
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.08);
+}
+
+.login-title {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 12px;
+
+  border: 1px solid #ccc;
+  border-radius: 9px;
+
+  font-size: 16px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #777;
+}
+
+.login-button {
+  width: 100%;
+  padding: 15px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #333;
+  color: white;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.login-button:active {
+  transform: scale(0.98);
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+}
+
+.login-error {
+  min-height: 22px;
+  margin-top: 12px;
+
+  text-align: center;
+
+  font-size: 14px;
+  color: #d94b4b;
+}
+
+
+/* =========================
+   管理画面
+========================= */
+
+#admin-area {
+  display: none;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: #999;
+  margin: -15px 0 25px;
+}
+
+
+/* 累計 */
+
+.summary {
+  background: #333;
+  color: white;
+
+  border-radius: 14px;
+
+  padding: 18px;
+  margin-bottom: 22px;
+
+  text-align: center;
+}
+
+.summary-title {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+}
+
+.summary-number {
+  font-size: 30px;
+  font-weight: bold;
+}
+
+
+/* 日別 */
+
+.day-card {
+  background: white;
+
+  border-radius: 14px;
+
+  padding: 20px;
+  margin-bottom: 16px;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.07);
+}
+
+.date {
+  font-size: 19px;
+  font-weight: bold;
+
+  margin-bottom: 16px;
+
+  text-align: center;
+}
+
+.row {
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 9px 4px;
+
+  border-bottom:
+    1px solid #eee;
+}
+
+.service-name {
+  font-size: 15px;
+}
+
+.count {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.total-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-top: 12px;
+  padding-top: 13px;
+
+  border-top:
+    2px solid #ddd;
+
+  font-weight: bold;
+}
+
+
+/* メッセージ */
+
+.empty,
+.error {
+  background: white;
+
+  border-radius: 14px;
+
+  padding: 30px 20px;
+
+  text-align: center;
+}
+
+.empty {
+  color: #999;
+}
+
+.error {
+  color: #d94b4b;
+}
+
+
+/* 更新時間 */
+
+.update {
+  text-align: center;
+
+  color: #aaa;
+
+  font-size: 12px;
+
+  margin: 20px 0;
+}
+
+
+/* ログアウト */
+
+.logout-button {
+  display: block;
+
+  margin: 30px auto 10px;
+
+  padding: 11px 25px;
+
+  border: 1px solid #ccc;
+  border-radius: 9px;
+
+  background: white;
+  color: #777;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+<h1>
+⭐️ GIFTBOX 管理 ⭐️
+</h1>
+
+
+
+<!-- =========================
+     ログイン画面
+========================= -->
+
+<div id="login-area">
+
+  <div class="login-box">
+
+    <div class="login-title">
+      🔐 管理者ログイン
+    </div>
+
+
+    <input
+      id="email"
+      class="input"
+      type="email"
+      placeholder="メールアドレス"
+      autocomplete="email"
+    >
+
+
+    <input
+      id="password"
+      class="input"
+      type="password"
+      placeholder="パスワード"
+      autocomplete="current-password"
+    >
+
+
+    <button
+      id="login-button"
+      class="login-button"
+    >
+      ログイン
+    </button>
+
+
+    <div
+      id="login-error"
+      class="login-error"
+    ></div>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     管理画面
+========================= -->
+
+<div id="admin-area">
+
+
+  <div class="subtitle">
+    Gift追加数
+  </div>
+
+
+  <div class="summary">
+
+    <div class="summary-title">
+      累計Gift
+    </div>
+
+    <div
+      id="grand-total"
+      class="summary-number"
+    >
+      0
+    </div>
+
+  </div>
+
+
+  <div id="stats"></div>
+
+
+  <div
+    id="update-time"
+    class="update"
+  ></div>
+
+
+  <button
+    id="logout-button"
+    class="logout-button"
+  >
+    ログアウト
+  </button>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================
+   Supabase
+========================= */
+
+const SUPABASE_URL =
+  "https://cgnluuynrurbsipwwluo.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_pZbtlCfKh1BVOxHaeXBIAA_CvfP0o0q";
+
+
+const client =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+
+/* =========================
+   パーツ
+========================= */
+
+const loginArea =
+  document.getElementById(
+    "login-area"
+  );
+
+
+const adminArea =
+  document.getElementById(
+    "admin-area"
+  );
+
+
+const emailInput =
+  document.getElementById(
+    "email"
+  );
+
+
+const passwordInput =
+  document.getElementById(
+    "password"
+  );
+
+
+const loginButton =
+  document.getElementById(
+    "login-button"
+  );
+
+
+const loginError =
+  document.getElementById(
+    "login-error"
+  );
+
+
+const logoutButton =
+  document.getElementById(
+    "logout-button"
+  );
+
+
+const stats =
+  document.getElementById(
+    "stats"
+  );
+
+
+const grandTotal =
+  document.getElementById(
+    "grand-total"
+  );
+
+
+const updateTime =
+  document.getElementById(
+    "update-time"
+  );
+
+
+
+/* =========================
+   ログイン画面表示
+========================= */
+
+function showLogin() {
+
+  loginArea.style.display =
+    "block";
+
+  adminArea.style.display =
+    "none";
+
+}
+
+
+
+/* =========================
+   管理画面表示
+========================= */
+
+function showAdmin() {
+
+  loginArea.style.display =
+    "none";
+
+  adminArea.style.display =
+    "block";
+
+}
+
+
+
+/* =========================
+   ログイン
+========================= */
+
+async function login() {
+
+
+  loginError.textContent =
+    "";
+
+
+  const email =
+    emailInput.value.trim();
+
+
+  const password =
+    passwordInput.value;
+
+
+  if (
+    !email ||
+    !password
+  ) {
+
+    loginError.textContent =
+      "メールアドレスとパスワードを入力してください";
+
+    return;
+  }
+
+
+  loginButton.disabled =
+    true;
+
+
+  loginButton.textContent =
+    "ログイン中…";
+
+
+  const {
+    data,
+    error
+  } =
+    await client.auth
+      .signInWithPassword({
+
+        email:
+          email,
+
+        password:
+          password
+
+      });
+
+
+  loginButton.disabled =
+    false;
+
+
+  loginButton.textContent =
+    "ログイン";
+
+
+  if (error) {
+
+    console.error(error);
+
+    loginError.textContent =
+      "メールアドレスまたはパスワードが違います";
+
+    return;
+  }
+
+
+  showAdmin();
+
+  loadStats();
+
+}
+
+
+
+/* =========================
+   ログインボタン
+========================= */
+
+loginButton.addEventListener(
+  "click",
+  login
+);
+
+
+
+/* Enterでもログイン */
+
+passwordInput.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      login();
+
+    }
+
+  }
+);
+
+
+
+/* =========================
+   ログアウト
+========================= */
+
+logoutButton.addEventListener(
+  "click",
+  async function() {
+
+
+    await client.auth
+      .signOut();
+
+
+    emailInput.value =
+      "";
+
+
+    passwordInput.value =
+      "";
+
+
+    showLogin();
+
+  }
+);
+
+
+
+/* =========================
+   日付表示
+========================= */
+
+function formatDate(
+  dateString
+) {
+
+
+  const [
+    year,
+    month,
+    day
+  ] =
+    dateString.split("-");
+
+
+  return (
+    Number(year) +
+    "年" +
+    Number(month) +
+    "月" +
+    Number(day) +
+    "日"
+  );
+
+}
+
+
+
+/* =========================
+   更新時間
+========================= */
+
+function showUpdateTime() {
+
+
+  const now =
+    new Date();
+
+
+  const text =
+    new Intl.DateTimeFormat(
+      "ja-JP",
+      {
+
+        timeZone:
+          "Asia/Tokyo",
+
+        month:
+          "numeric",
+
+        day:
+          "numeric",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hour12:
+          false
+
+      }
+    ).format(now);
+
+
+  updateTime.textContent =
+    text +
+    " 時点";
+
+}
+
+
+
+/* =========================
+   永久保存された集計を取得
+========================= */
+
+async function loadStats() {
+
+
+  const {
+    data,
+    error
+  } =
+    await client
+
+      .from(
+        "gift_daily_stats"
+      )
+
+      .select(
+        "stat_date, service, gift_count"
+      )
+
+      .order(
+        "stat_date",
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+
+    stats.innerHTML =
+      `<div class="error">
+        集計データを読み込めませんでした。
+      </div>`;
+
+
+    return;
+  }
+
+
+  const records =
+    data || [];
+
+
+  let allTotal =
+    0;
+
+
+  records.forEach(
+    item => {
+
+      allTotal +=
+        Number(
+          item.gift_count
+        ) || 0;
+
+    }
+  );
+
+
+  grandTotal.textContent =
+    allTotal;
+
+
+  if (
+    records.length === 0
+  ) {
+
+    stats.innerHTML =
+      `<div class="empty">
+        まだ記録はありません🎁
+      </div>`;
+
+
+    showUpdateTime();
+
+    return;
+  }
+
+
+
+  /* =========================
+     日付ごとにまとめる
+  ========================= */
+
+  const grouped =
+    {};
+
+
+  records.forEach(
+    item => {
+
+
+      const date =
+        item.stat_date;
+
+
+      if (
+        !grouped[date]
+      ) {
+
+        grouped[date] =
+          {
+
+            itunes: 0,
+
+            recochoku: 0,
+
+            mumo: 0,
+
+            total: 0
+
+          };
+
+      }
+
+
+      const count =
+        Number(
+          item.gift_count
+        ) || 0;
+
+
+      if (
+        item.service ===
+        "itunes"
+      ) {
+
+        grouped[date]
+          .itunes +=
+          count;
+
+      }
+
+
+      if (
+        item.service ===
+        "recochoku"
+      ) {
+
+        grouped[date]
+          .recochoku +=
+          count;
+
+      }
+
+
+      if (
+        item.service ===
+        "mumo"
+      ) {
+
+        grouped[date]
+          .mumo +=
+          count;
+
+      }
+
+
+      grouped[date]
+        .total +=
+        count;
+
+    }
+  );
+
+
+
+  const dates =
+    Object.keys(
+      grouped
+    ).sort(
+      (a, b) =>
+        b.localeCompare(a)
+    );
+
+
+  stats.innerHTML =
+    "";
+
+
+
+  dates.forEach(
+    date => {
+
+
+      const counts =
+        grouped[date];
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "day-card";
+
+
+      card.innerHTML =
+        `
+
+        <div class="date">
+          ${formatDate(date)}
+        </div>
+
+
+        <div class="row">
+
+          <span class="service-name">
+            iTunes
+          </span>
+
+          <span class="count">
+            ${counts.itunes}件
+          </span>
+
+        </div>
+
+
+        <div class="row">
+
+          <span class="service-name">
+            レコチョク
+          </span>
+
+          <span class="count">
+            ${counts.recochoku}件
+          </span>
+
+        </div>
+
+
+        <div class="row">
+
+          <span class="service-name">
+            mu-mo
+          </span>
+
+          <span class="count">
+            ${counts.mumo}件
+          </span>
+
+        </div>
+
+
+        <div class="total-row">
+
+          <span>
+            合計
+          </span>
+
+          <span>
+            ${counts.total}件
+          </span>
+
+        </div>
+
+        `;
+
+
+      stats.appendChild(
+        card
+      );
+
+    }
+  );
+
+
+  showUpdateTime();
+
+}
+
+
+
+/* =========================
+   ページを開いた時
+========================= */
+
+async function checkSession() {
+
+
+  const {
+    data
+  } =
+    await client.auth
+      .getSession();
+
+
+  if (
+    data.session
+  ) {
+
+    /*
+      前回ログイン済みなら
+      そのまま管理画面
+    */
+
+    showAdmin();
+
+    loadStats();
+
+
+  } else {
+
+    /*
+      未ログインなら
+      ログイン画面
+    */
+
+    showLogin();
+
+  }
+
+}
+
+
+checkSession();
+
+
+
+/* =========================
+   30秒ごとに更新
+========================= */
+
+setInterval(
+  async function() {
+
+
+    const {
+      data
+    } =
+      await client.auth
+        .getSession();
+
+
+    if (
+      data.session
+    ) {
+
+      loadStats();
+
+    }
+
+  },
+  30000
+);
+
+
+</script>
+
+
+</body>
+</html>

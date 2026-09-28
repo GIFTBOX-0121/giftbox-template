@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GIFTBOX</title>
+
+<style>
+
+body {
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Helvetica Neue",
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
+
+  background: #f7f7f7;
+  margin: 0;
+  padding: 30px 15px;
+  color: #333;
+}
+
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+
+/* タイトル */
+
+h1 {
+  margin: 0 0 20px;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+
+/* メイン画像 */
+
+.main-image {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  margin: 0 auto 20px;
+  border-radius: 12px;
+}
+
+
+/* 区切り線 */
+
+.line {
+  border-top: 1px solid #ddd;
+  margin: 20px 0;
+}
+
+
+/* クイズエリア */
+
+.quiz-area {
+  background: white;
+  padding: 24px 18px;
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.08);
+}
+
+
+/* 質問 */
+
+.question {
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+
+/* 入力欄 */
+
+.answer-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 15px;
+
+  border: 1px solid #ccc;
+  border-radius: 9px;
+
+  font-size: 16px;
+  text-align: center;
+
+  outline: none;
+}
+
+
+.answer-input:focus {
+  border-color: #777;
+}
+
+
+/* 送信ボタン */
+
+.submit-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #333;
+  color: white;
+
+  font-size: 16px;
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+
+.submit-button:active {
+  transform: scale(0.98);
+}
+
+
+/* 不正解メッセージ */
+
+.error-message {
+  min-height: 22px;
+  margin-top: 12px;
+
+  font-size: 14px;
+  color: #d94b4b;
+}
+
+
+/* サービス選択 */
+
+.service-area {
+  display: none;
+}
+
+
+.service-area.show {
+  display: block;
+}
+
+
+/* サービスボタン */
+
+.service-button {
+  display: block;
+  box-sizing: border-box;
+
+  width: 100%;
+
+  margin-bottom: 14px;
+  padding: 17px;
+
+  border-radius: 10px;
+
+  background: #333;
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 17px;
+  font-weight: bold;
+
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.08);
+
+  transition:
+    transform 0.1s ease;
+}
+
+
+.service-button:active {
+  transform: scale(0.98);
+}
+
+
+/* 正解後の表示 */
+
+.fade-in {
+  animation:
+    fadeIn 0.4s ease;
+}
+
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+<h1>
+⭐️ GIFTBOX ⭐️
+</h1>
+
+
+<img
+  src="FC567E6B-12F2-4604-8848-9ED7DD1E54EF.jpeg"
+  class="main-image"
+  alt="GIFTBOX"
+>
+
+
+<div class="line"></div>
+
+
+
+<!-- =========================
+     クイズ
+========================= -->
+
+
+<div
+  id="quiz-area"
+  class="quiz-area"
+>
+
+
+<div class="question">
+
+🎞 お花見with STARGLOW 🌸の配信コメント欄に<br>
+
+GOICHIが残したコメント（最初の11文字）は❓
+
+</div>
+
+
+<input
+  id="answer-input"
+  class="answer-input"
+  type="text"
+  placeholder="答えを入力"
+  autocomplete="off"
+>
+
+
+<button
+  id="submit-button"
+  class="submit-button"
+>
+
+送信
+
+</button>
+
+
+<div
+  id="error-message"
+  class="error-message"
+></div>
+
+
+</div>
+
+
+
+<!-- =========================
+     サービス選択
+========================= -->
+
+
+<div
+  id="service-area"
+  class="service-area"
+>
+
+
+<a
+  href="itunes.html"
+  class="service-button"
+>
+
+iTunes
+
+</a>
+
+
+<a
+  href="recochoku.html"
+  class="service-button"
+>
+
+レコチョク
+
+</a>
+
+
+<a
+  href="mumo.html"
+  class="service-button"
+>
+
+mu-mo
+
+</a>
+
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+/* =========================
+   正解
+========================= */
+
+
+const CORRECT_ANSWER =
+  "ぶんぶんはろーすたーず";
+
+
+/* =========================
+   各パーツ
+========================= */
+
+
+const quizArea =
+  document.getElementById(
+    "quiz-area"
+  );
+
+
+const serviceArea =
+  document.getElementById(
+    "service-area"
+  );
+
+
+const answerInput =
+  document.getElementById(
+    "answer-input"
+  );
+
+
+const submitButton =
+  document.getElementById(
+    "submit-button"
+  );
+
+
+const errorMessage =
+  document.getElementById(
+    "error-message"
+  );
+
+
+
+/* =========================
+   回答を整える
+========================= */
+
+
+function normalizeAnswer(text) {
+
+  return text
+
+    /* 前後の空白を削除 */
+
+    .trim()
+
+    /* 全角スペースを削除 */
+
+    .replace(
+      /　/g,
+      ""
+    )
+
+    /* 半角スペース等を削除 */
+
+    .replace(
+      /\s/g,
+      ""
+    );
+}
+
+
+
+/* =========================
+   サービス選択を表示
+========================= */
+
+
+function showServices(withAnimation = true) {
+
+
+  /*
+    クイズを消す
+  */
+
+  quizArea.style.display =
+    "none";
+
+
+  /*
+    サービスを表示
+  */
+
+  serviceArea.classList.add(
+    "show"
+  );
+
+
+  /*
+    正解した直後だけ
+    ふわっと表示
+  */
+
+  if (withAnimation) {
+
+    serviceArea.classList.add(
+      "fade-in"
+    );
+
+  }
+
+}
+
+
+
+/* =========================
+   過去に正解済みか確認
+========================= */
+
+
+const alreadyAuthenticated =
+  localStorage.getItem(
+    "giftbox_authenticated"
+  );
+
+
+if (
+  alreadyAuthenticated ===
+  "true"
+) {
+
+
+  /*
+    以前に正解済みなら
+    クイズを出さない
+  */
+
+  showServices(false);
+
+}
+
+
+
+/* =========================
+   回答判定
+========================= */
+
+
+function checkAnswer() {
+
+
+  const answer =
+    normalizeAnswer(
+      answerInput.value
+    );
+
+
+  const correct =
+    normalizeAnswer(
+      CORRECT_ANSWER
+    );
+
+
+  if (
+    answer === correct
+  ) {
+
+
+    /*
+      正解したことを
+      このブラウザに保存
+    */
+
+    localStorage.setItem(
+      "giftbox_authenticated",
+      "true"
+    );
+
+
+    /*
+      サービス選択へ切り替え
+    */
+
+    showServices(true);
+
+
+  } else {
+
+
+    /*
+      不正解
+    */
+
+    errorMessage.textContent =
+      "答えが違います🥲";
+
+
+    answerInput.focus();
+
+
+    answerInput.select();
+
+  }
+
+}
+
+
+
+/* =========================
+   送信ボタン
+========================= */
+
+
+submitButton.addEventListener(
+  "click",
+  checkAnswer
+);
+
+
+
+/* =========================
+   Enterでも送信
+========================= */
+
+
+answerInput.addEventListener(
+  "keydown",
+  function(event) {
+
+
+    if (
+      event.key === "Enter"
+    ) {
+
+
+      checkAnswer();
+
+
+    }
+
+  }
+);
+
+
+
+/* =========================
+   再入力したら
+   エラーを消す
+========================= */
+
+
+answerInput.addEventListener(
+  "input",
+  function() {
+
+
+    errorMessage.textContent =
+      "";
+
+
+  }
+);
+
+
+</script>
+
+
+</body>
+</html>
