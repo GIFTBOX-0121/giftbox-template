@@ -6,6 +6,7 @@
 
 <title>GIFTBOX 管理</title>
 
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -386,6 +387,15 @@ h1 {
 
 
 /* =========================
+   曲設定
+========================= */
+
+const SONG_ID =
+  GIFTBOX_CONFIG.songId;
+
+
+
+/* =========================
    Supabase
 ========================= */
 
@@ -719,7 +729,7 @@ function showUpdateTime() {
 
 
 /* =========================
-   永久保存された集計を取得
+   この楽曲の永久保存集計を取得
 ========================= */
 
 async function loadStats() {
@@ -736,7 +746,12 @@ async function loadStats() {
       )
 
       .select(
-        "stat_date, service, gift_count"
+        "stat_date, service, song_id, gift_count"
+      )
+
+      .eq(
+        "song_id",
+        SONG_ID
       )
 
       .order(
