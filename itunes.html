@@ -351,8 +351,8 @@ h1 {
 <h1>iTunes</h1>
 
 <img
+  id="header-image"
   class="header-image"
-  src="24BAC62E-3563-42A4-9EE5-F72598664198.jpeg"
   alt=""
 >
 
@@ -476,6 +476,19 @@ h1 {
 
 const SONG_ID =
   GIFTBOX_CONFIG.songId;
+
+
+/* =========================
+   サービス画像
+========================= */
+
+const headerImage =
+  document.getElementById(
+    "header-image"
+  );
+
+headerImage.src =
+  GIFTBOX_CONFIG.images.service;
 
 
 /* =========================
