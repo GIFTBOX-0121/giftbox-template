@@ -6,6 +6,8 @@
 
 <title>GIFTBOX</title>
 
+<script src="config.js"></script>
+
 <style>
 
 body {
@@ -227,7 +229,7 @@ h1 {
 
 
 <img
-  src="FC567E6B-12F2-4604-8848-9ED7DD1E54EF.jpeg"
+  id="main-image"
   class="main-image"
   alt="GIFTBOX"
 >
@@ -338,6 +340,22 @@ mu-mo
 
 
 /* =========================
+   トップ画像
+========================= */
+
+
+const mainImage =
+  document.getElementById(
+    "main-image"
+  );
+
+
+mainImage.src =
+  GIFTBOX_CONFIG.images.top;
+
+
+
+/* =========================
    正解
 ========================= */
 
@@ -391,18 +409,12 @@ function normalizeAnswer(text) {
 
   return text
 
-    /* 前後の空白を削除 */
-
     .trim()
-
-    /* 全角スペースを削除 */
 
     .replace(
       /　/g,
       ""
     )
-
-    /* 半角スペース等を削除 */
 
     .replace(
       /\s/g,
@@ -420,27 +432,14 @@ function normalizeAnswer(text) {
 function showServices(withAnimation = true) {
 
 
-  /*
-    クイズを消す
-  */
-
   quizArea.style.display =
     "none";
 
-
-  /*
-    サービスを表示
-  */
 
   serviceArea.classList.add(
     "show"
   );
 
-
-  /*
-    正解した直後だけ
-    ふわっと表示
-  */
 
   if (withAnimation) {
 
@@ -469,12 +468,6 @@ if (
   alreadyAuthenticated ===
   "true"
 ) {
-
-
-  /*
-    以前に正解済みなら
-    クイズを出さない
-  */
 
   showServices(false);
 
@@ -507,30 +500,17 @@ function checkAnswer() {
   ) {
 
 
-    /*
-      正解したことを
-      このブラウザに保存
-    */
-
     localStorage.setItem(
       "giftbox_authenticated",
       "true"
     );
 
 
-    /*
-      サービス選択へ切り替え
-    */
-
     showServices(true);
 
 
   } else {
 
-
-    /*
-      不正解
-    */
 
     errorMessage.textContent =
       "答えが違います🥲";
