@@ -6,6 +6,7 @@
 
 <title>mu-mo</title>
 
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
@@ -437,6 +438,18 @@ h1 {
 
 <script>
 
+/* =========================
+   曲設定
+========================= */
+
+const SONG_ID =
+  GIFTBOX_CONFIG.songId;
+
+
+/* =========================
+   Supabase
+========================= */
+
 const SUPABASE_URL =
 "https://cgnluuynrurbsipwwluo.supabase.co";
 
@@ -668,6 +681,9 @@ submitAddButton.addEventListener(
           service:
             "mumo",
 
+          song_id:
+            SONG_ID,
+
           gift_code:
             giftUrl
 
@@ -743,11 +759,15 @@ async function loadGifts() {
     await client
       .from("gifts")
       .select(
-        "id, gift_code, service"
+        "id, gift_code, service, song_id"
       )
       .eq(
         "service",
         "mumo"
+      )
+      .eq(
+        "song_id",
+        SONG_ID
       )
       .order(
         "id",
